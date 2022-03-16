@@ -1,10 +1,13 @@
-import { getDataToDate } from "../../api/cbrData";
+import { getDataToDate, getData10days } from "../../api/cbrData";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { Table, Card, Tooltip } from "antd";
+import { Table, Card, Tooltip, Modal } from "antd";
 
 const CurrViewer = () => {
   const [currencyNow, setCurrencyNow] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [datesValues, setDatesValues] = useState([]);
+  const [currentValute, setCurrentValute] = useState("No_Valute_Changed");
 
   useEffect(() => {
     const getCurrencyNow = async () =>
@@ -54,7 +57,40 @@ const CurrViewer = () => {
       bordered={true}
       style={{ width: "75%", margin: "10px" }}
     >
-      {currencyNow && <Table dataSource={currencyNow} columns={columns} />}
+      <Modal
+        title={currentValute}
+        visible={isModalVisible}
+        onOk={() => setModalVisible(false)}
+        onCancel={() => setModalVisible(false)}
+      >
+        {datesValues &&
+          datesValues.map((el) => (
+            <p>
+              <b>{el.date_} </b>: {el.value}
+            </p>
+          ))}
+      </Modal>
+
+      {currencyNow && (
+        <Table
+          dataSource={currencyNow}
+          columns={columns}
+          onRow={(record, _) => {
+            return {
+              onClick: async () => {
+                setModalVisible(true);
+                setCurrentValute(record.CharCode);
+                return setDatesValues(
+                  await getData10days(
+                    moment().format("YYYY/MM/DD"),
+                    record.CharCode
+                  )
+                );
+              },
+            };
+          }}
+        />
+      )}
     </Card>
   );
 };
