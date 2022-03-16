@@ -1,9 +1,10 @@
-function App() {
+import CurrViewer from "./components/CurrViewer/CurrViewer";
+import 'antd/dist/antd.css'
+const App = () => {
   return (
     <div className="App">
-      <b> Get Started!</b>
+      <CurrViewer />
     </div>
   );
 }
-
 export default App;
